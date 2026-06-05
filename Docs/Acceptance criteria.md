@@ -40,8 +40,8 @@ Allow the user to manually add a creator/account/profile they want to check inte
 
 * Display name
 * Platform
-* Profile URL
-* Optional handle
+* Handle for supported platforms
+* Custom profile URL for Other and edge cases
 
 ## Acceptance Criteria
 
@@ -55,13 +55,15 @@ Allow the user to manually add a creator/account/profile they want to check inte
   * X
   * Reddit
   * Other
-* User can enter a profile URL.
-* User can optionally enter a handle.
+* User can enter a handle for supported platforms.
+* User can enter a custom profile URL for Other and edge cases.
 * Save is blocked or shows an error if display name is empty.
-* Save is blocked or shows an error if profile URL is empty.
+* Save is blocked or shows an error if supported-platform handle is empty and no custom URL is provided.
+* Save is blocked or shows an error if Other profile URL is empty.
 * Save is blocked or shows an error if platform is missing.
-* URL is accepted if it begins with `http://` or `https://`.
-* URL may be normalised to include `https://` if missing.
+* Custom URL is accepted if it begins with `http://` or `https://`.
+* Custom URL may be normalised to include `https://` if missing.
+* Supported-platform profile URLs pasted into the handle field are cleaned where simple.
 * Created creator receives:
 
   * id
@@ -201,21 +203,22 @@ Show one creator at a time and help the user check them intentionally.
 
 ## Acceptance Criteria
 
-* Screen shows progress, e.g. “1 of 3”.
+* Screen shows progress, e.g. "1 of 3".
 * Screen shows creator display name.
 * Screen shows platform.
 * Screen shows last checked date if available.
-* Screen has “Open profile” button.
-* Screen has “Mark done” button.
-* Screen has “Skip” button.
+* Screen has "Open profile" button.
+* Screen explains that swiping up advances the queue.
+* Screen has a visible fallback action for done or skip.
 * Open profile opens the stored profile URL externally.
 * If the profile URL cannot be opened, user sees a simple error.
-* Mark done creates a done check-in.
-* Mark done updates creator `lastCheckedAt`.
-* Mark done moves to the next creator.
-* Skip creates a skipped check-in.
-* Skip does not update `lastCheckedAt` in v0.1.
-* Skip moves to the next creator.
+* Swiping up after opening a profile creates a done check-in.
+* Swiping up after opening a profile updates creator `lastCheckedAt`.
+* Swiping up without opening creates a skipped check-in.
+* Swiping up without opening does not update `lastCheckedAt`.
+* A skipped creator shows a temporary undo action.
+* Undo removes the skipped check-in and returns to that creator.
+* Swiping up moves to the next creator.
 * When the queue is complete, user is taken to Done screen.
 * No feed is displayed.
 * No platform content is embedded inside Finite.
@@ -228,13 +231,12 @@ Show one creator at a time and help the user check them intentionally.
 4. Tap Open profile.
 5. Confirm external URL opens.
 6. Return to Finite.
-7. Tap Mark done.
+7. Swipe up.
 8. Confirm second creator is shown.
-9. Tap Skip.
+9. Swipe up without opening.
 10. Confirm Done screen appears.
 
 ---
-
 # Feature: Done Screen
 
 ## Goal
@@ -265,7 +267,7 @@ Now leave before the algorithm finds you.
 
 1. Add one creator.
 2. Start catch-up.
-3. Mark creator done.
+3. Tap Open profile, return, and swipe up.
 4. Confirm Done screen appears.
 5. Tap Back home.
 6. Confirm Home screen appears.

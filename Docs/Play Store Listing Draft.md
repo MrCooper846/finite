@@ -25,7 +25,7 @@ Features:
 - set check frequency
 - pause creators without deleting them
 - open creator profile URLs externally
-- mark creators done or skipped
+- swipe through creators as done or skipped
 - view recent check-ins
 - export and import a local JSON backup
 - clear local data

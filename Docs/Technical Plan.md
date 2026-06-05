@@ -27,7 +27,7 @@ v0.1 prototype.
 The v0.1 goal is to prove the core catch-up flow:
 
 ```text
-Add creator → Start catch-up → Open profile → Mark done or skip → Finish queue → Leave
+Add creator -> Start catch-up -> Open profile -> Swipe up -> Finish queue -> Leave
 ```
 
 v0.1 does not require a backend, account system, platform APIs, cloud sync, payments, or scraping.
@@ -114,7 +114,7 @@ The user should be able to:
 * see saved creators
 * start a catch-up session
 * open creator links
-* mark creators done or skipped
+* swipe through creators as done or skipped
 
 without waiting for a network request.
 
@@ -238,15 +238,16 @@ Fields:
 
 * display name
 * platform
-* profile URL
-* optional handle
+* handle for supported platforms
+* custom profile URL for Other and edge cases
 
 Validation:
 
 * display name is required
 * platform is required
-* profile URL is required
-* profile URL should look like a URL
+* supported-platform handle is required unless a custom profile URL is provided
+* Other requires a profile URL
+* custom profile URL should look like a URL
 
 Do not add platform API validation yet.
 
@@ -283,14 +284,13 @@ Platform
 Last checked: 3 days ago
 
 [Open profile]
-[Mark done]
-[Skip]
+Swipe up to continue
 ```
 
 Behaviour:
 
 * Open profile uses external linking
-* Mark done records a check-in
+* Swiping up after opening records a done check-in
 * Skip records a skipped check-in
 * Both actions move to the next creator
 * When the queue is complete, navigate to DoneScreen
@@ -442,9 +442,10 @@ v0.1 validation should be simple.
 For adding creators:
 
 * display name must not be empty
-* profile URL must not be empty
+* supported-platform handle must not be empty unless a custom profile URL is provided
+* Other profile URL must not be empty
 * platform must be selected
-* URL should begin with http:// or https://, or be normalised to https:// where appropriate
+* custom URL should begin with http:// or https://, or be normalised to https:// where appropriate
 
 Do not validate whether the profile actually exists in v0.1.
 

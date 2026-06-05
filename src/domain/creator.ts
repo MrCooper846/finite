@@ -4,6 +4,7 @@ export const PLATFORMS = [
   "youtube",
   "x",
   "reddit",
+  "reddit_community",
   "other",
 ] as const;
 
@@ -55,7 +56,8 @@ export function getPlatformLabel(platform: Platform): string {
     tiktok: "TikTok",
     youtube: "YouTube",
     x: "X",
-    reddit: "Reddit",
+    reddit: "Reddit User",
+    reddit_community: "Reddit Forum",
     other: "Other",
   };
 

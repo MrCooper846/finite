@@ -10,6 +10,7 @@ import {
 } from "../domain/creator";
 import { createLocalId } from "../utils/ids";
 import { nowIso } from "../utils/dates";
+import { normaliseHandle } from "../utils/profileLinks";
 
 const STORAGE_KEYS = {
   creators: "finite.creators",
@@ -65,7 +66,7 @@ export async function addCreator(input: NewCreatorInput): Promise<Creator> {
     displayName: input.displayName.trim(),
     platform: input.platform,
     profileUrl: input.profileUrl.trim(),
-    handle: input.handle?.trim() || undefined,
+    handle: normaliseHandle(input.platform, input.handle ?? "") || undefined,
     isActive: true,
     checkFrequency: input.checkFrequency ?? "daily",
     createdAt: timestamp,
@@ -93,7 +94,10 @@ export async function updateCreator(
     handle:
       updates.handle === undefined
         ? existingCreator.handle
-        : updates.handle.trim() || undefined,
+        : normaliseHandle(
+            updates.platform ?? existingCreator.platform,
+            updates.handle,
+          ) || undefined,
     updatedAt: nowIso(),
   };
 
@@ -130,6 +134,11 @@ export async function addCheckIn(input: CreateCheckInInput): Promise<CheckIn> {
 
   await saveCheckIns([checkIn, ...checkIns]);
   return checkIn;
+}
+
+export async function deleteCheckIn(id: string): Promise<void> {
+  const checkIns = await getCheckIns();
+  await saveCheckIns(checkIns.filter((checkIn) => checkIn.id !== id));
 }
 
 export async function getHasSeenOnboarding(): Promise<boolean> {
@@ -207,7 +216,7 @@ function normaliseStoredCreator(creator: Creator): Creator {
     displayName: creator.displayName?.trim() || "Unnamed creator",
     platform,
     profileUrl: creator.profileUrl?.trim() || "https://example.com",
-    handle: creator.handle?.trim() || undefined,
+    handle: normaliseHandle(platform, creator.handle ?? "") || undefined,
     isActive: creator.isActive ?? true,
     checkFrequency: storedFrequency ?? "daily",
   };

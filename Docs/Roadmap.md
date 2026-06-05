@@ -68,7 +68,7 @@ Build the smallest working version of Finite.
 This milestone proves the core loop:
 
 ```text
-Add creator → Start catch-up → Open profile → Mark done/skip → Finish → Leave
+Add creator -> Start catch-up -> Open profile -> Swipe up -> Finish -> Leave
 ```
 
 ## Features
@@ -123,8 +123,8 @@ Add creator → Start catch-up → Open profile → Mark done/skip → Finish �
 * Show progress, e.g. “2 of 7”
 * Show last checked date if available
 * Open profile externally
-* Mark done
-* Skip
+* Swipe up after opening to mark done
+* Swipe up without opening to skip
 * Move to next creator
 * Navigate to Done screen when queue is complete
 

@@ -21,6 +21,14 @@ import {
   Platform,
   PLATFORMS,
 } from "../domain/creator";
+import {
+  buildProfileUrl,
+  cleanProfileUrlForDisplay,
+  getHandleHelperText,
+  getHandlePlaceholder,
+  isHandlePlatform,
+  normaliseHandle,
+} from "../utils/profileLinks";
 import { validateCreatorInput } from "../utils/validation";
 
 type AddCreatorScreenProps = {
@@ -35,17 +43,31 @@ export function AddCreatorScreen({
   onSave,
 }: AddCreatorScreenProps) {
   const isEditing = Boolean(creator);
-  const [displayName, setDisplayName] = useState(creator?.displayName ?? "");
-  const [platform, setPlatform] = useState<Platform>(
-    creator?.platform ?? "instagram",
+  const initialPlatform = creator?.platform ?? "instagram";
+  const initialHandle = normaliseHandle(
+    initialPlatform,
+    creator?.handle ?? creator?.profileUrl ?? "",
   );
-  const [profileUrl, setProfileUrl] = useState(creator?.profileUrl ?? "");
-  const [handle, setHandle] = useState(creator?.handle ?? "");
+  const initialGeneratedUrl = buildProfileUrl(initialPlatform, initialHandle);
+  const initialCleanProfileUrl = creator?.profileUrl
+    ? cleanProfileUrlForDisplay(creator.profileUrl)
+    : "";
+  const initialProfileUrl =
+    creator?.profileUrl &&
+    (!isHandlePlatform(initialPlatform) ||
+      initialCleanProfileUrl !== initialGeneratedUrl)
+      ? creator.profileUrl
+      : "";
+  const [displayName, setDisplayName] = useState(creator?.displayName ?? "");
+  const [platform, setPlatform] = useState<Platform>(initialPlatform);
+  const [profileUrl, setProfileUrl] = useState(initialProfileUrl);
+  const [handle, setHandle] = useState(initialHandle);
   const [checkFrequency, setCheckFrequency] = useState<CheckFrequency>(
     creator?.checkFrequency ?? "daily",
   );
   const [errors, setErrors] = useState<{
     displayName?: string;
+    handle?: string;
     profileUrl?: string;
   }>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -53,10 +75,16 @@ export function AddCreatorScreen({
   async function handleSave() {
     const result = validateCreatorInput({
       displayName,
+      platform,
+      handle,
       profileUrl,
     });
 
-    if (result.errors.displayName || result.errors.profileUrl) {
+    if (
+      result.errors.displayName ||
+      result.errors.handle ||
+      result.errors.profileUrl
+    ) {
       setErrors(result.errors);
       return;
     }
@@ -69,13 +97,26 @@ export function AddCreatorScreen({
         displayName,
         platform,
         profileUrl: result.normalisedProfileUrl ?? profileUrl,
-        handle,
+        handle: result.normalisedHandle,
         checkFrequency,
       });
     } finally {
       setIsSaving(false);
     }
   }
+
+  function handlePlatformChange(nextPlatform: Platform) {
+    setPlatform(nextPlatform);
+    setHandle(normaliseHandle(nextPlatform, handle));
+  }
+
+  function handleHandleChange(value: string) {
+    setHandle(normaliseHandle(platform, value));
+  }
+
+  const cleanHandle = normaliseHandle(platform, handle);
+  const generatedProfileUrl = buildProfileUrl(platform, cleanHandle);
+  const supportsHandle = isHandlePlatform(platform);
 
   return (
     <KeyboardAvoidingView
@@ -91,7 +132,7 @@ export function AddCreatorScreen({
             {isEditing ? "Edit creator" : "Add creator"}
           </Text>
           <Text style={styles.subtitle}>
-            {isEditing ? "Keep the route useful." : "Open what you came for."}
+            {isEditing ? "Keep the route useful." : "Choose the route. Skip the feed."}
           </Text>
         </View>
 
@@ -111,7 +152,7 @@ export function AddCreatorScreen({
                 <Pressable
                   accessibilityRole="button"
                   key={item}
-                  onPress={() => setPlatform(item)}
+                  onPress={() => handlePlatformChange(item)}
                   style={[
                     styles.platformOption,
                     item === platform && styles.platformOptionSelected,
@@ -130,23 +171,45 @@ export function AddCreatorScreen({
             </View>
           </View>
 
-          <Field
-            autoCapitalize="none"
-            error={errors.profileUrl}
-            keyboardType="url"
-            label="Profile URL"
-            onChangeText={setProfileUrl}
-            placeholder="https://instagram.com/example"
-            value={profileUrl}
-          />
+          {supportsHandle ? (
+            <>
+              <Field
+                autoCapitalize="none"
+                error={errors.handle}
+                helperText={getHandleHelperText(platform)}
+                label="Handle"
+                onChangeText={handleHandleChange}
+                placeholder={getHandlePlaceholder(platform)}
+                value={handle}
+              />
 
-          <Field
-            autoCapitalize="none"
-            label="Handle"
-            onChangeText={setHandle}
-            placeholder="@example"
-            value={handle}
-          />
+              {generatedProfileUrl ? (
+                <Text style={styles.generatedUrl}>{generatedProfileUrl}</Text>
+              ) : null}
+
+              <Field
+                autoCapitalize="none"
+                error={errors.profileUrl}
+                helperText="Optional. Use only when Finite cannot generate the right profile URL."
+                keyboardType="url"
+                label="Custom profile URL"
+                onChangeText={setProfileUrl}
+                placeholder="Optional override"
+                value={profileUrl}
+              />
+            </>
+          ) : (
+            <Field
+              autoCapitalize="none"
+              error={errors.profileUrl}
+              helperText={getHandleHelperText(platform)}
+              keyboardType="url"
+              label="Profile URL"
+              onChangeText={setProfileUrl}
+              placeholder={getHandlePlaceholder(platform)}
+              value={profileUrl}
+            />
+          )}
 
           <View style={styles.field}>
             <Text style={styles.label}>Check frequency</Text>
@@ -198,6 +261,7 @@ type FieldProps = {
   placeholder: string;
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   error?: string;
+  helperText?: string;
   keyboardType?: "default" | "url";
 };
 
@@ -208,11 +272,12 @@ function Field({
   placeholder,
   autoCapitalize = "sentences",
   error,
+  helperText,
   keyboardType = "default",
 }: FieldProps) {
   return (
-    <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.field}>
+        <Text style={styles.label}>{label}</Text>
       <TextInput
         autoCapitalize={autoCapitalize}
         keyboardType={keyboardType}
@@ -222,6 +287,7 @@ function Field({
         style={[styles.input, error && styles.inputError]}
         value={value}
       />
+      {helperText ? <Text style={styles.helper}>{helperText}</Text> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
@@ -232,12 +298,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   screen: {
-    gap: 24,
+    gap: 22,
     padding: 22,
-    paddingTop: 28,
+    paddingTop: 30,
   },
   header: {
-    gap: 10,
+    gap: 9,
   },
   back: {
     color: "#4f4a43",
@@ -246,15 +312,16 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#111111",
-    fontSize: 34,
+    fontSize: 35,
     fontWeight: "900",
+    lineHeight: 40,
   },
   subtitle: {
     color: "#5f584e",
     fontSize: 17,
   },
   form: {
-    gap: 18,
+    gap: 17,
   },
   field: {
     gap: 8,
@@ -265,8 +332,8 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   input: {
-    backgroundColor: "#ffffff",
-    borderColor: "#dfd8cc",
+    backgroundColor: "#fffefa",
+    borderColor: "#ddd6ca",
     borderRadius: 8,
     borderWidth: 1,
     color: "#111111",
@@ -283,8 +350,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   platformOption: {
-    backgroundColor: "#ffffff",
-    borderColor: "#dfd8cc",
+    backgroundColor: "#fffefa",
+    borderColor: "#ddd6ca",
     borderRadius: 8,
     borderWidth: 1,
     paddingHorizontal: 12,
@@ -306,5 +373,20 @@ const styles = StyleSheet.create({
     color: "#8f241b",
     fontSize: 14,
     fontWeight: "700",
+  },
+  helper: {
+    color: "#6f675d",
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  generatedUrl: {
+    backgroundColor: "#eef4f0",
+    borderColor: "#cfddd6",
+    borderRadius: 8,
+    borderWidth: 1,
+    color: "#33443d",
+    fontSize: 13,
+    lineHeight: 19,
+    padding: 12,
   },
 });

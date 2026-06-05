@@ -126,7 +126,7 @@ Review or edit saved creators.
 Catch-up:
 
 ```text
-Open this creator, then mark done or skip.
+Open this creator, then swipe up.
 ```
 
 Done:
@@ -272,7 +272,7 @@ The initial experience should be:
 Add a creator.
 Start catch-up.
 Open profile.
-Mark done.
+Swipe up.
 Finish.
 ```
 
@@ -304,8 +304,7 @@ Platform
 Last checked date
 
 [Open profile]
-[Mark done]
-[Skip]
+Swipe up to continue
 ```
 
 No extra content should compete with the main action.

@@ -1,0 +1,10 @@
+{
+  "build": {
+    "android-beta": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  }
+}

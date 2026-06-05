@@ -72,40 +72,22 @@ export function SettingsScreen({
 
       <View style={styles.header}>
         <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>Keep the app boring and reliable.</Text>
+        <Text style={styles.subtitle}>Local data. Boring on purpose.</Text>
       </View>
 
       <View style={styles.panel}>
-        <Text style={styles.sectionTitle}>This week</Text>
+        <Text style={styles.sectionTitle}>Data</Text>
+        <Text style={styles.copy}>
+          {dataHealth.issueCount === 0
+            ? "Everything local looks tidy."
+            : "Some old check-ins point to creators that no longer exist."}
+        </Text>
         <View style={styles.statsGrid}>
           <Stat label="Due today" value={stats.dueCreatorCount} />
           <Stat label="Checked" value={stats.completedThisWeek} />
           <Stat label="Skipped" value={stats.skippedThisWeek} />
           <Stat label="Sessions" value={stats.recentSessionCount} />
         </View>
-      </View>
-
-      <View style={styles.panel}>
-        <Text style={styles.sectionTitle}>Android beta prep</Text>
-        <Text style={styles.copy}>
-          Expo SDK 56 is active. Local data, backup, and the core queue are in
-          place for device testing.
-        </Text>
-        <View style={styles.checklist}>
-          <Text style={styles.checkItem}>Ready: local-first core flow</Text>
-          <Text style={styles.checkItem}>Ready: creator backup JSON</Text>
-          <Text style={styles.checkItem}>Ready: privacy and store drafts</Text>
-          <Text style={styles.checkItem}>Next: physical Android QA pass</Text>
-        </View>
-      </View>
-
-      <View style={styles.panel}>
-        <Text style={styles.sectionTitle}>Data health</Text>
-        <Text style={styles.copy}>
-          {dataHealth.issueCount === 0
-            ? "Local data looks consistent."
-            : "Some check-ins refer to creators that no longer exist."}
-        </Text>
         <View style={styles.checklist}>
           <Text style={styles.checkItem}>
             Missing creator references: {dataHealth.missingCreatorReferences}
@@ -117,21 +99,9 @@ export function SettingsScreen({
       </View>
 
       <View style={styles.panel}>
-        <Text style={styles.sectionTitle}>Privacy</Text>
-        <Text style={styles.copy}>
-          Finite stores creators and check-ins on this device. It does not use
-          accounts, analytics, cloud sync, ads, scraping, or platform APIs.
-        </Text>
-        <Text style={styles.copy}>
-          Exported backups are plain JSON. Anyone with the backup can read the
-          creator URLs inside it.
-        </Text>
-      </View>
-
-      <View style={styles.panel}>
         <Text style={styles.sectionTitle}>Backup</Text>
         <Text style={styles.copy}>
-          Export creates a JSON backup below. Import accepts the same format.
+          Export gives you plain JSON. Not glamorous. Very useful.
         </Text>
         <BigButton
           disabled={isWorking}
@@ -163,9 +133,20 @@ export function SettingsScreen({
       </View>
 
       <View style={styles.panel}>
+        <Text style={styles.sectionTitle}>About</Text>
+        <Text style={styles.copy}>
+          Finite stores creators and check-ins on this device. It does not use
+          accounts, analytics, cloud sync, ads, scraping, or platform APIs.
+        </Text>
+        <Text style={styles.copy}>
+          Local data, backup, and the core queue are ready for device testing.
+        </Text>
+      </View>
+
+      <View style={styles.panel}>
         <Text style={styles.sectionTitle}>Reset</Text>
         <Text style={styles.copy}>
-          Clear creators and check-ins when you want a fresh local prototype.
+          Clear creators and check-ins when you want a clean slate.
         </Text>
         <BigButton
           disabled={isWorking}
@@ -189,17 +170,18 @@ function Stat({ label, value }: { label: string; value: number }) {
 
 const styles = StyleSheet.create({
   screen: {
-    gap: 20,
+    gap: 18,
     padding: 22,
-    paddingTop: 28,
+    paddingTop: 30,
   },
   header: {
     gap: 8,
   },
   title: {
     color: "#101413",
-    fontSize: 34,
+    fontSize: 35,
     fontWeight: "900",
+    lineHeight: 40,
   },
   subtitle: {
     color: "#46514c",
@@ -207,7 +189,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   panel: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fffefa",
     borderColor: "#d7e0da",
     borderRadius: 8,
     borderWidth: 1,
@@ -231,7 +213,9 @@ const styles = StyleSheet.create({
   },
   stat: {
     backgroundColor: "#eef4f0",
+    borderColor: "#cfddd6",
     borderRadius: 8,
+    borderWidth: 1,
     minWidth: "47%",
     padding: 12,
   },

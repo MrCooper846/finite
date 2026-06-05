@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
   base: {
     alignItems: "center",
     borderRadius: 8,
+    borderWidth: 1,
     minHeight: 52,
     justifyContent: "center",
     paddingHorizontal: 18,
@@ -46,23 +47,26 @@ const styles = StyleSheet.create({
   },
   primary: {
     backgroundColor: "#101413",
+    borderColor: "#101413",
   },
   secondary: {
-    backgroundColor: "#e5eee9",
+    backgroundColor: "#eef4f0",
+    borderColor: "#cfddd6",
   },
   danger: {
-    backgroundColor: "#f4d8d2",
+    backgroundColor: "#f8e0dc",
+    borderColor: "#e9b7ae",
   },
   disabled: {
     opacity: 0.45,
   },
   pressed: {
-    opacity: 0.75,
+    opacity: 0.82,
   },
   label: {
     color: "#ffffff",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "800",
   },
   darkLabel: {
     color: "#101413",

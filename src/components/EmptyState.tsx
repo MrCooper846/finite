@@ -16,16 +16,16 @@ export function EmptyState({ message, title }: EmptyStateProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fbfcfa",
     borderColor: "#d7e0da",
     borderRadius: 8,
     borderWidth: 1,
-    gap: 8,
-    padding: 18,
+    gap: 10,
+    padding: 20,
   },
   title: {
     color: "#101413",
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "900",
   },
   message: {

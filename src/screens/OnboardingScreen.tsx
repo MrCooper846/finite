@@ -25,7 +25,7 @@ export function OnboardingScreen({
       <View style={styles.steps}>
         <Step label="1" text="Add creators manually." />
         <Step label="2" text="Start a finite catch-up queue." />
-        <Step label="3" text="Open profiles, mark done, then leave." />
+        <Step label="3" text="Open profiles, swipe up, then leave." />
       </View>
 
       <View style={styles.actions}>
@@ -50,7 +50,7 @@ function Step({ label, text }: { label: string; text: string }) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    gap: 26,
+    gap: 24,
     justifyContent: "center",
     paddingHorizontal: 22,
   },
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   step: {
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fffefa",
     borderColor: "#d7e0da",
     borderRadius: 8,
     borderWidth: 1,

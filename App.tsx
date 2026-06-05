@@ -25,6 +25,7 @@ import {
   addCheckIn,
   addCreator,
   clearFiniteData,
+  deleteCheckIn,
   deleteCreator,
   exportFiniteData,
   FiniteBackup,
@@ -54,6 +55,12 @@ type DoneSummary = {
   totalCount: number;
 };
 
+type UndoSkipState = {
+  checkIn: CheckIn;
+  creator: Creator;
+  previousSession: CatchUpSession;
+};
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [creators, setCreators] = useState<Creator[]>([]);
@@ -61,6 +68,7 @@ export default function App() {
   const [session, setSession] = useState<CatchUpSession | null>(null);
   const [editingCreator, setEditingCreator] = useState<Creator | undefined>();
   const [backupText, setBackupText] = useState("");
+  const [undoSkip, setUndoSkip] = useState<UndoSkipState | null>(null);
   const [doneSummary, setDoneSummary] = useState<DoneSummary>({
     doneCount: 0,
     skippedCount: 0,
@@ -92,6 +100,18 @@ export default function App() {
 
     load();
   }, [loadCreators]);
+
+  useEffect(() => {
+    if (!undoSkip) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setUndoSkip(null);
+    }, 6000);
+
+    return () => clearTimeout(timeoutId);
+  }, [undoSkip]);
 
   async function handleAddCreator(input: NewCreatorInput) {
     try {
@@ -174,6 +194,7 @@ export default function App() {
       return;
     }
 
+    setUndoSkip(null);
     const currentCreator = getCurrentSessionCreator(session, creators);
 
     if (!currentCreator) {
@@ -216,8 +237,39 @@ export default function App() {
       } else {
         setSession(nextSession);
       }
+
+      if (status === "skipped") {
+        setUndoSkip({
+          checkIn,
+          creator: currentCreator,
+          previousSession: session,
+        });
+      }
     } catch {
       Alert.alert("Could not save check-in", "Please try again.");
+    }
+  }
+
+  async function handleUndoSkip() {
+    if (!undoSkip) {
+      return;
+    }
+
+    try {
+      await deleteCheckIn(undoSkip.checkIn.id);
+      setCheckIns((currentCheckIns) =>
+        currentCheckIns.filter((checkIn) => checkIn.id !== undoSkip.checkIn.id),
+      );
+      setSession(undoSkip.previousSession);
+      setDoneSummary({
+        doneCount: undoSkip.previousSession.completedCreatorIds.length,
+        skippedCount: undoSkip.previousSession.skippedCreatorIds.length,
+        totalCount: undoSkip.previousSession.creatorIds.length,
+      });
+      setScreen("catchUp");
+      setUndoSkip(null);
+    } catch {
+      Alert.alert("Could not undo skip", "Please try again.");
     }
   }
 
@@ -330,6 +382,7 @@ export default function App() {
       {screen === "home" ? (
         <HomeScreen
           activeCreatorCount={queue.length}
+          queuePreview={queue.slice(0, 3)}
           totalCreatorCount={creators.filter((creator) => creator.isActive).length}
           onAddCreator={() => {
             setEditingCreator(undefined);
@@ -395,6 +448,20 @@ export default function App() {
           stats={stats}
         />
       ) : null}
+      {undoSkip ? (
+        <View style={styles.undoBar}>
+          <Text numberOfLines={1} style={styles.undoText}>
+            Skipped {undoSkip.creator.displayName}
+          </Text>
+          <Text
+            accessibilityRole="button"
+            onPress={() => void handleUndoSkip()}
+            style={styles.undoAction}
+          >
+            Undo
+          </Text>
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -430,6 +497,32 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: "#46514c",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  undoAction: {
+    color: "#ffffff",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+  undoBar: {
+    alignItems: "center",
+    backgroundColor: "#17201d",
+    borderColor: "#2e4239",
+    borderRadius: 8,
+    borderWidth: 1,
+    bottom: 18,
+    flexDirection: "row",
+    gap: 12,
+    left: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    position: "absolute",
+    right: 18,
+  },
+  undoText: {
+    color: "#ffffff",
+    flex: 1,
     fontSize: 15,
     fontWeight: "700",
   },

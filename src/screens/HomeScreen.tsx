@@ -2,10 +2,14 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BigButton } from "../components/BigButton";
 import { EmptyState } from "../components/EmptyState";
+import { PlatformBadge } from "../components/PlatformBadge";
+import { Creator } from "../domain/creator";
 import { FiniteStats } from "../domain/stats";
+import { formatHandle } from "../utils/profileLinks";
 
 type HomeScreenProps = {
   activeCreatorCount: number;
+  queuePreview: Creator[];
   totalCreatorCount: number;
   onAddCreator: () => void;
   onManageCreators: () => void;
@@ -16,6 +20,7 @@ type HomeScreenProps = {
 
 export function HomeScreen({
   activeCreatorCount,
+  queuePreview,
   totalCreatorCount,
   onAddCreator,
   onManageCreators,
@@ -31,7 +36,7 @@ export function HomeScreen({
       <View style={styles.hero}>
         <Text style={styles.kicker}>Finite</Text>
         <Text style={styles.title}>Scroll like you mean it.</Text>
-        <Text style={styles.subtitle}>Keep up. Then leave.</Text>
+        <Text style={styles.subtitle}>A short route in. A clean exit out.</Text>
       </View>
 
       <View style={styles.panel}>
@@ -39,11 +44,30 @@ export function HomeScreen({
         <Text style={styles.count}>{activeCreatorCount}</Text>
         <Text style={styles.panelCopy}>
           {hasDueCreators
-            ? "Open each creator, mark them checked, then leave."
+            ? "Open what you came for. Swipe through the rest."
             : hasAnyCreators
               ? `${totalCreatorCount} active creators. None are due right now.`
-              : "Add a creator to start."}
+              : "Add one creator. Keep the queue honest."}
         </Text>
+        {queuePreview.length > 0 ? (
+          <View style={styles.previewList}>
+            {queuePreview.map((creator) => (
+              <View style={styles.previewRow} key={creator.id}>
+                <View style={styles.previewTextGroup}>
+                  <Text numberOfLines={1} style={styles.previewName}>
+                    {creator.displayName}
+                  </Text>
+                  {creator.handle ? (
+                    <Text numberOfLines={1} style={styles.previewHandle}>
+                      {formatHandle(creator.platform, creator.handle)}
+                    </Text>
+                  ) : null}
+                </View>
+                <PlatformBadge platform={creator.platform} />
+              </View>
+            ))}
+          </View>
+        ) : null}
       </View>
 
       <View style={styles.stats}>
@@ -55,13 +79,13 @@ export function HomeScreen({
       {!hasAnyCreators ? (
         <EmptyState
           title="Your queue is empty."
-          message="Choose what you came for. Add one creator and Finite becomes useful."
+          message="No feed. No recommendations. Just the people you choose."
         />
       ) : null}
       {hasAnyCreators && !hasDueCreators ? (
         <EmptyState
           title="Nothing due today."
-          message="You are caught up for now. Manual creators stay out of the queue until you change their frequency."
+          message="You are caught up for now. Suspiciously peaceful."
         />
       ) : null}
 
@@ -70,7 +94,6 @@ export function HomeScreen({
           label={hasDueCreators ? "Start catch-up" : "Add creator"}
           onPress={hasDueCreators ? onStartCatchUp : onAddCreator}
         />
-        <BigButton label="Add creator" onPress={onAddCreator} variant="secondary" />
         <BigButton
           label="Manage creators"
           onPress={onManageCreators}
@@ -97,13 +120,13 @@ function MiniStat({ label, value }: { label: string; value: number }) {
 
 const styles = StyleSheet.create({
   screen: {
-    gap: 22,
+    gap: 20,
     paddingHorizontal: 22,
-    paddingTop: 28,
-    paddingBottom: 22,
+    paddingTop: 30,
+    paddingBottom: 26,
   },
   hero: {
-    gap: 10,
+    gap: 11,
   },
   kicker: {
     color: "#4e655a",
@@ -114,9 +137,9 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#101413",
-    fontSize: 42,
+    fontSize: 43,
     fontWeight: "900",
-    lineHeight: 46,
+    lineHeight: 47,
   },
   subtitle: {
     color: "#46514c",
@@ -124,11 +147,12 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
   panel: {
-    backgroundColor: "#ffffff",
-    borderColor: "#d7e0da",
+    backgroundColor: "#fffefa",
+    borderColor: "#d6ded8",
     borderRadius: 8,
     borderWidth: 1,
-    padding: 20,
+    gap: 8,
+    padding: 22,
   },
   panelLabel: {
     color: "#4e655a",
@@ -138,14 +162,40 @@ const styles = StyleSheet.create({
   },
   count: {
     color: "#101413",
-    fontSize: 58,
+    fontSize: 64,
     fontWeight: "900",
-    lineHeight: 68,
+    lineHeight: 72,
   },
   panelCopy: {
     color: "#46514c",
     fontSize: 16,
     lineHeight: 23,
+  },
+  previewHandle: {
+    color: "#6c675e",
+    fontSize: 13,
+  },
+  previewList: {
+    borderTopColor: "#e6ded2",
+    borderTopWidth: 1,
+    gap: 9,
+    marginTop: 8,
+    paddingTop: 12,
+  },
+  previewName: {
+    color: "#101413",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+  previewRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 10,
+    justifyContent: "space-between",
+  },
+  previewTextGroup: {
+    flex: 1,
+    gap: 2,
   },
   actions: {
     gap: 12,
@@ -155,12 +205,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   stat: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fbfcfa",
     borderColor: "#d7e0da",
     borderRadius: 8,
     borderWidth: 1,
     flex: 1,
-    padding: 12,
+    padding: 13,
   },
   statValue: {
     color: "#101413",

@@ -1,13 +1,24 @@
+import { Platform } from "../domain/creator";
+import {
+  buildProfileUrl,
+  isHandlePlatform,
+  normaliseHandle,
+} from "./profileLinks";
+
 export type CreatorValidationInput = {
   displayName: string;
+  platform: Platform;
+  handle: string;
   profileUrl: string;
 };
 
 export type CreatorValidationResult = {
   errors: {
     displayName?: string;
+    handle?: string;
     profileUrl?: string;
   };
+  normalisedHandle?: string;
   normalisedProfileUrl?: string;
 };
 
@@ -29,21 +40,33 @@ export function validateCreatorInput(
   input: CreatorValidationInput,
 ): CreatorValidationResult {
   const errors: CreatorValidationResult["errors"] = {};
+  const supportsHandle = isHandlePlatform(input.platform);
+  const normalisedHandle = normaliseHandle(input.platform, input.handle);
   const normalisedProfileUrl = normaliseProfileUrl(input.profileUrl);
+  const generatedProfileUrl = buildProfileUrl(input.platform, normalisedHandle);
 
   if (!input.displayName.trim()) {
     errors.displayName = "Display name is required.";
   }
 
-  if (!input.profileUrl.trim()) {
-    errors.profileUrl = "Profile URL is required.";
-  } else if (!isValidHttpUrl(normalisedProfileUrl)) {
+  if (input.profileUrl.trim() && !isValidHttpUrl(normalisedProfileUrl)) {
     errors.profileUrl = "This URL does not look right.";
+  }
+
+  if (supportsHandle && !normalisedProfileUrl && !generatedProfileUrl) {
+    errors.handle = "Handle is required unless you add a custom profile URL.";
+  }
+
+  if (!supportsHandle && !normalisedProfileUrl) {
+    errors.profileUrl = "Profile URL is required.";
   }
 
   return {
     errors,
-    normalisedProfileUrl,
+    normalisedHandle: supportsHandle && normalisedHandle
+      ? normalisedHandle
+      : undefined,
+    normalisedProfileUrl: normalisedProfileUrl || generatedProfileUrl,
   };
 }
 

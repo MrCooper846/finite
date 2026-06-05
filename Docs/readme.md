@@ -27,7 +27,7 @@ But once they open the platform, infinite scroll, recommendations, For You pages
 Finite solves this by turning social media use into a finite ritual:
 
 ```text
-Add creators → Start catch-up → Open profile → Mark done or skip → Finish queue → Leave
+Add creators -> Start catch-up -> Open profile -> Swipe up -> Finish queue -> Leave
 ```
 
 ## Philosophy
@@ -56,7 +56,7 @@ The first working version should allow the user to:
 
 * add a creator manually
 * choose a platform
-* save a profile URL
+* enter a handle or custom profile URL
 * view saved creators
 * delete creators
 * start a catch-up queue

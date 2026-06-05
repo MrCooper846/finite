@@ -30,7 +30,8 @@ The app should work with:
 
 * display name
 * platform
-* profile URL
+* generated or custom profile URL
+* optional handle
 * active status
 * check-in history
 
@@ -61,6 +62,7 @@ export type Platform =
   | "youtube"
   | "x"
   | "reddit"
+  | "reddit_community"
   | "other";
 ```
 
@@ -72,7 +74,8 @@ export const PLATFORM_LABELS: Record<Platform, string> = {
   tiktok: "TikTok",
   youtube: "YouTube",
   x: "X",
-  reddit: "Reddit",
+  reddit: "Reddit User",
+  reddit_community: "Reddit Forum",
   other: "Other",
 };
 ```
@@ -143,6 +146,7 @@ https://www.tiktok.com/@example
 https://www.youtube.com/@example
 https://x.com/example
 https://www.reddit.com/user/example
+https://www.reddit.com/r/example
 ```
 
 v0.1 should not require the URL to be verified against the platform.

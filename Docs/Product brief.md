@@ -84,7 +84,7 @@ As a user, I want to create a list of creators I care about, open them one at a 
 5. Finite shows one creator at a time.
 6. User opens that creator in the original platform.
 7. User returns to Finite.
-8. User marks the creator done or skipped.
+8. User swipes up to mark the opened creator done, or skips by swiping without opening.
 9. Finite moves to the next creator.
 10. When the queue is complete, Finite tells the user they are caught up.
 ```
@@ -163,7 +163,7 @@ The prototype is successful if a user can:
 * add several creators
 * start a catch-up session
 * open each creator externally
-* mark creators done or skipped
+* swipe through creators as done or skipped
 * finish the queue
 * understand the purpose of the app without explanation
 
@@ -179,7 +179,7 @@ It should include:
 * creator management
 * catch-up queue
 * external profile opening
-* mark done / skip
+* swipe to mark creators done or skipped
 * last checked state
 * basic reminders
 * import/export backup

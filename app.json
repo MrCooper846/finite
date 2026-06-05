@@ -23,6 +23,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f00836f1-2b41-4b1a-ab2a-33f4180889cb"
+      }
+    },
+    "owner": "mrcooper846s-organization"
   }
 }
